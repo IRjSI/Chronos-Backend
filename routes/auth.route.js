@@ -33,7 +33,7 @@ authRouter.use(
     callbacks: {
       async redirect({ url, baseUrl }) {
         // Always redirect to frontend
-        return "http://localhost:5173";
+        return "https://chronoss.vercel.app/";
       },
     },
     events: {
