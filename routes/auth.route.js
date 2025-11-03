@@ -30,6 +30,26 @@ authRouter.use(
     ],
     secret: process.env.AUTH_SECRET,
     trustHost: true,
+
+    cookies: {
+      callbackUrl: {
+        name: "__Secure-authjs.callback-url",
+        options: {
+          httpOnly: true,
+          sameSite: "none", // <-- Key fix
+          secure: true,     // <-- Required for __Secure-* cookies
+        },
+      },
+      sessionToken: {
+        name: "__Secure-authjs.session-token",
+        options: {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+        },
+      },
+    },
+    
     callbacks: {
       async redirect({ url, baseUrl }) {
         // Always redirect to frontend
