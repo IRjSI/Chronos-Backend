@@ -18,7 +18,7 @@ DBConnection();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://chronoss.vercel.app"],
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     allowedHeaders: ["Content-Type", "x-auth-csrf-token"],
