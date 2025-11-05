@@ -20,8 +20,8 @@ authRouter.use(
     adapter: MongoDBAdapter(clientPromise),
     providers: [
       GitHub({
-        clientId: process.env.GITHUB_CLIENT_ID_DEV,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET_DEV,
+        clientId: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
       }),
       // Google({
       //   clientId: process.env.GOOGLE_CLIENT_ID,
