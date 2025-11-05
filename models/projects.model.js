@@ -22,6 +22,12 @@ const projectSchema = new mongoose.Schema({
             ref: "Task"
         }
     ],
+    comments: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Comment"
+        }
+    ],
     progress: {
         type: Number
     },

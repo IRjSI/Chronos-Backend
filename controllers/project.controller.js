@@ -2,6 +2,7 @@
 import { getSession } from "@auth/express";
 import projectsModel from "../models/projects.model.js";
 import taskModel from "../models/task.model.js";
+import commentModel from "../models/comment.model.js";
 
 /**
  * GET /projects
@@ -33,6 +34,19 @@ export async function getProjectTasks(req, res) {
     res.json({ message: "Retrieved project tasks", data: { projectTasks, projectProgress } });
   } catch (error) {
     console.error("Error fetching project tasks:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function getComments(req, res) {
+  try {
+
+    const { projectId } = req.params;
+    const comments = await commentModel.find({ userId: req.user.id, projectId: projectId });
+    
+    res.json({ message: "Retrieved project comments", data: comments });
+  } catch (error) {
+    console.error("Error fetching project comments:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
@@ -97,6 +111,32 @@ export async function addProjectTask(req, res) {
   }
 }
 
+export async function addComment(req, res) {
+  try {
+
+    const { projectId } = req.params;
+    const { content } = req.body;
+    if (!content) return res.status(400).json({ message: "Content is required" });
+
+    const comment = await commentModel.create({
+      content,
+      userId: req.user.id,
+      projectId
+    });
+
+    await projectsModel.findByIdAndUpdate(projectId, { 
+      $push: {
+        comment: comment._id
+      }
+    }, { new: true });
+
+    res.status(201).json({ message: "Created project comment", data: comment });
+  } catch (error) {
+    console.error("Error creating project comment:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 /**
  * PUT /projects/:id
  * Edit an existing project
@@ -118,6 +158,27 @@ export async function editProject(req, res) {
     res.json({ message: "Project updated", data: project });
   } catch (error) {
     console.error("Error editing project:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function editComment(req, res) {
+  try {
+
+    const { projectId } = req.params;
+    const { content } = req.body;
+
+    const comment = await commentModel.findOneAndUpdate(
+      { userId: req.user.id, projectId },
+      { content },
+      { new: true }
+    );
+
+    if (!comment) return res.status(404).json({ message: "Project not found" });
+
+    res.json({ message: "Comment updated", data: comment });
+  } catch (error) {
+    console.error("Error editing comment:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
@@ -194,6 +255,23 @@ export async function deleteProjectTask(req, res) {
     res.json({ message: "Project deleted successfully" });
   } catch (error) {
     console.error("Error deleting project:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+export async function deleteComment(req, res) {
+  try {
+
+    const { commentId } = req.params;
+    const comment = await commentModel.findOneAndDelete({
+      _id: commentId,
+      userId: req.user.id,
+    });
+
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    res.json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
